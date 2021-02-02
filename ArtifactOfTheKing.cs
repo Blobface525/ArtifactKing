@@ -22,12 +22,16 @@ namespace Blobface
     {
         public void Awake()
         {
-            On.EntityStates.BrotherMonster.BaseSlideState.OnEnter += (orig, self) =>
+            On.EntityStates.BrotherMonster.WeaponSlam.FixedUpdate += (orig, self) =>
             {
                 BaseState RefBase = new BaseState();
-                var DamStat = RefBase.GetFieldValue<float>("damageStat");
-                Ray aimRay = RefBase.InvokeMethod<Ray>("GetAimRay");
-                ProjectileManager.instance.FireProjectile(FireTwinShots.projectilePrefab, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, RefBase.GetFieldValue<float>("damageStat") * FireTwinShots.damageCoefficient, FireTwinShots.force, Util.CheckRoll(RefBase.GetFieldValue<float>("critStat"), RefBase.GetPropertyValue<int>("master")), DamageColorIndex.Default, null, -1f);
+                float DamStat = RefBase.GetFieldValue<float>("damageStat");
+                CharacterBody RefBody = new CharacterBody();//RefBody.corePosition
+                Transform transform = RefBase.InvokeMethod<Transform>("FindModelChild", WeaponSlam.muzzleString);
+                Vector3 position = transform.position;
+
+                ProjectileManager.instance.FireProjectile(WeaponSlam.pillarProjectilePrefab, position, Quaternion.identity, base.gameObject, DamStat * WeaponSlam.pillarDamageCoefficient, 0f, Util.CheckRoll(RefBase.GetFieldValue<float>("critStat"), RefBase.GetPropertyValue<int>("master")), DamageColorIndex.Default, null, -1f);
+                
                 orig(self);
             };
         }
